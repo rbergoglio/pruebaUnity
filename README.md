@@ -1,2 +1,2 @@
-# pruebaUnity
-aprendiendo a compartir proyectos de unity
+# FirstPersonGame
+I'm using a bunch of different tutorials to make a first person game in Unity
