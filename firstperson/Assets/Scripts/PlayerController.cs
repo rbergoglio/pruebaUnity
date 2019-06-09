@@ -20,7 +20,7 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        
+
         //Rotation
 
         float rotLeftRight = Input.GetAxis("Mouse X")* mouseSensibility;
@@ -32,7 +32,6 @@ public class PlayerController : MonoBehaviour {
         //Movement
         float fowardSpeed = Input.GetAxis("Vertical")*movementSpeed;
         float sideSpeed = Input.GetAxis("Horizontal") * movementSpeed;
-
         
         if (cc.isGrounded){
             //verticalVelocity = 0;
