@@ -11,6 +11,11 @@ public class HandController : MonoBehaviour
     private Transform _currentGrabObject;
     public float GrabDistance = 0.1f;
     public string GrabTag = "Grab";
+    public string GrabInput = "Grab";
+    private bool _isGrabbing;
+    public float ThrowMultiplier = 1.5f;
+    private Vector3 _lastFramePosition;
+
 
 
     void OnDrawGizmosSelected()
@@ -30,6 +35,8 @@ public class HandController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        _isGrabbing = false;
+        _lastFramePosition = transform.position;
 
         _currentGrabObject = null;
     }
@@ -39,7 +46,7 @@ public class HandController : MonoBehaviour
     {
         /*
         Debug.Log(rb.position);
-
+        
         float fowardSpeed = Input.GetAxis("VerticalH") * movementSpeed;
         float sideSpeed = Input.GetAxis("HorizontalH") * movementSpeed;
         rb.transform.position += new Vector3(sideSpeed,0, fowardSpeed);
@@ -47,27 +54,62 @@ public class HandController : MonoBehaviour
         if (_currentGrabObject == null)
         {
             Collider[] colliders = Physics.OverlapSphere(transform.position, GrabDistance);
-            if (colliders[0].tag.Equals(GrabTag))
+            if (colliders.Length > 0)
             {
-                Debug.Log(colliders[0].tag);
-            }
-            else
-            {
-                Debug.Log("NO");
-            }
-            if (Input.GetAxis("Circulo") >= 0.01f && colliders[0].transform.CompareTag(GrabTag))
-            {
-                colliders[0].transform.SetParent(transform);
-                if (colliders[0].GetComponent<Rigidbody>() == null)
+                if ( colliders[0].tag.Equals(GrabTag))
                 {
-                    colliders[0].gameObject.AddComponent<Rigidbody>();
+                    Debug.Log(colliders[0].tag);
                 }
-                colliders[0].GetComponent<Rigidbody>().isKinematic = true;
+                else
+                {
+                    Debug.Log("NO");
 
+                }
+                if (Input.GetAxis(GrabInput) >= 0.01f && colliders[0].transform.CompareTag(GrabTag))
+                {
+                    if (_isGrabbing)
+                    {
+                        return;
+                    }
+                    _isGrabbing = true;
 
+                    colliders[0].transform.SetParent(transform);
+                    if (colliders[0].GetComponent<Rigidbody>() == null)
+                    {
+                        colliders[0].gameObject.AddComponent<Rigidbody>();
+                    }
+                    colliders[0].GetComponent<Rigidbody>().isKinematic = true;
+                    _currentGrabObject = colliders[0].transform;
+
+                }
             }
 
         }
+        else
+        {
+            
+            if (Input.GetAxis(GrabInput) < 0.01f)
+            {
+                Rigidbody _objectRGB = _currentGrabObject.GetComponent<Rigidbody>();
+                _objectRGB.isKinematic = false;
+                _objectRGB.collisionDetectionMode = CollisionDetectionMode.Continuous;
+
+                Vector3 CurrentVelocity = (transform.position - _lastFramePosition) / Time.deltaTime;
+
+                _objectRGB.velocity = CurrentVelocity * ThrowMultiplier;
+
+                _currentGrabObject.SetParent(null);
+
+                _currentGrabObject = null;
+               
+            }
+            
+        }
+        if (Input.GetAxis(GrabInput) < 0.01f && _isGrabbing)
+        {
+            _isGrabbing = false;
+        }
+        _lastFramePosition = transform.position;
 
     }
 }
