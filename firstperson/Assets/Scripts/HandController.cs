@@ -9,9 +9,11 @@ public class HandController : MonoBehaviour
     private Rigidbody rb;
     public float movementSpeed = 5f;
     private Transform _currentGrabObject;
+    private Rigidbody _currentSpinObject;
     public float GrabDistance = 0.1f;
-    public string GrabTag = "Grab";
-    public string GrabInput = "Grab";
+    private string GrabTag = "Grab";
+    private string SpinTag = "Spin";
+    private string GrabInput = "Grab";
     private bool _isGrabbing;
     public float ThrowMultiplier = 1.5f;
     private Vector3 _lastFramePosition;
@@ -35,36 +37,50 @@ public class HandController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
+        //rb.AddForce(300,0,0);
         _isGrabbing = false;
         _lastFramePosition = transform.position;
-
+        
         _currentGrabObject = null;
+    }
+
+    void FixedUpdate()
+
+    {
+        /*
+        float fowardSpeed = Input.GetAxis("VerticalH");
+        float sideSpeed = Input.GetAxis("HorizontalH");
+
+        Vector3 tempVect = new Vector3(sideSpeed, fowardSpeed,0);
+        Debug.Log(tempVect.normalized * movementSpeed);
+        tempVect = tempVect.normalized * movementSpeed * Time.deltaTime;
+        rb.MovePosition(transform.position + tempVect);
+        */
+        
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        Debug.Log(rb.position);
         
-        float fowardSpeed = Input.GetAxis("VerticalH") * movementSpeed;
-        float sideSpeed = Input.GetAxis("HorizontalH") * movementSpeed;
-        rb.transform.position += new Vector3(sideSpeed,0, fowardSpeed);
-        */
+        
+        
+        
+       
         if (_currentGrabObject == null)
         {
             Collider[] colliders = Physics.OverlapSphere(transform.position, GrabDistance);
             if (colliders.Length > 0)
             {
-                if ( colliders[0].tag.Equals(GrabTag))
-                {
-                    Debug.Log(colliders[0].tag);
-                }
-                else
-                {
-                    Debug.Log("NO");
+                if (Input.GetAxis(GrabInput) >= 0.01f && colliders[0].transform.CompareTag(SpinTag))
 
+                {
+                    Debug.Log("ssssssss");
+                    _currentSpinObject = colliders[0].attachedRigidbody;
+                    _currentSpinObject.MoveRotation(_currentSpinObject.rotation *Quaternion.Euler(0,30,0));
+               
                 }
+
                 if (Input.GetAxis(GrabInput) >= 0.01f && colliders[0].transform.CompareTag(GrabTag))
                 {
                     if (_isGrabbing)
